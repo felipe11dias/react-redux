@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { add_task } from '../actions/action';
+import axios from 'axios';
 
 function mapDispatchToProps(dispatch){
     return {
@@ -12,8 +13,8 @@ class FormTask extends Component {
     state = {
         title: "", done: false
     }
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -27,8 +28,24 @@ class FormTask extends Component {
         const { title } = this.state;
         const { done } = this.state;
         this.props.add_task({title, done});
+
+        const task = {
+            title: this.state.title,
+            done: this.state.done
+        };
+        let header = {
+            headers: {
+                'Content-Type': 'application/json;'
+            }
+        };
+
+        axios.post(`http://localhost:3001/tasks`, { task }, { header })
+        .then(res => {
+            console.log(res);
+            console.log(res.data);
+            this.props.loadTasks();
+        });
         this.setState({title: "", done: false})
-    
     }
 
     render(){
